@@ -6,6 +6,7 @@ import socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # bind to address
+# later change gethostname() to the public IP address of external server
 s.bind((socket.gethostname(), 1234))
 
 # make a queue of 5 in case we have multiple incoming connections
