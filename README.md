@@ -1,0 +1,3 @@
+# Controls System
+
+The  Controls  System  oversees  the  Propulsion  and  Braking  Systems  of  the  pod.   It  is  responsible  formonitoring sensor data,  executing subroutines as well as pod error handling.  A Programmable LogicController (PLC) will be used to conduct all the main operations and computations of the pod.  Thepod’s status (health, position, velocity, etc.)  is continuously communicated with the monitoring stationwith a Network Access Panel (NAP) which is interfaced to the PLC. The NAP supports bidirectionalcommunication which will allow us to send operative commands to the pod.
