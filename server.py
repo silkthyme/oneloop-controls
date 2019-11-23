@@ -16,4 +16,4 @@ while True:
 	# now our endpoint knows about the other endpoint
 	clientsocket, address = s.accept()
 	print(f"Connection from {address} has been established.")
-
+	clientsocket.send(bytes("Sending data from server to client.\n CLient received data, exiting.","utf-8"))
