@@ -1,19 +1,22 @@
 import socket
+import time
+import pickle
 
-# create the IP socket (endpoint in a communication)
-# AF_INET == ipv4 (domain)
-# SOCK_STREAM == TCP (TCP means connection-oriented)
+
+HEADERSIZE = 10
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-# bind to address
-# later change gethostname() to the public IP address of external server
-s.bind((socket.gethostname(), 1234))
-
-# make a queue of 5 in case we have multiple incoming connections
+s.bind((socket.gethostname(), 1243))
 s.listen(5)
 
 while True:
-	# now our endpoint knows about the other endpoint
-	clientsocket, address = s.accept()
-	print(f"Connection from {address} has been established.")
-	clientsocket.send(bytes("\n> Transmitting data . . . \n> Data received, exiting.\n","utf-8"))
+    # now our endpoint knows about the OTHER endpoint.
+    clientsocket, address = s.accept()
+    print(f"Connection from {address} has been established.")
+
+    d = {1:"Transmitting data . . . ", 2: "Data received"}
+    msg = pickle.dumps(d)
+    msg = bytes(f"{len(msg):<{HEADERSIZE}}", 'utf-8')+msg
+    print(msg)
+    clientsocket.send(msg)
+
