@@ -91,17 +91,25 @@ optimal_freq = []
 freq_increment = 1
 v_fidelity = 100
 
+
 def simulate():
     # v_s and the second condition in the while loop prevent runaway simulations
     v_s = 0
-    while max_thrust_speed < max_speed and v_s < max_speed + 100):
+    f = 10
+    max_thrust_speed = 0
+    max_speed = 111.76
+    freq_increment = 1
+    while (max_thrust_speed < max_speed and v_s < max_speed + 100):
         # Other Parameters
-        v_s = 2 * f * tau                   # Motor speed             
-        v = linspace(1,v_s, v_fidelity)     # Velocity array
-        omega = 2 * pi * f                  # Angular frequency
-    #     c = (4*rho_s*g*omega)./(mu_0*(v.^2));       % Intermediate term
+        max_thrust_speed += 1
+        print(v_s)
+        print(f)
+        v_s = 2 * f * tau                           # Motor speed             
+        v = np.linspace(1, v_s, num=v_fidelity)     # Velocity array
+        omega = 2 * math.pi * f                     # Angular frequency
+        c = (4*rho_s*g*omega) / (mu_0*(v**2))       # Intermediate term
     # tau_e = (v*pi)/(omega*(2^0.5))...           % Shockwave half wavelength
-    #     .*(1 + (1 + (c.^2)).^0.5).^0.5;
+    #     .*s(1 + (1 + (c.^2)).^0.5).^0.5;
     # beta = (rho_s*g)./(v*mu_0);                 % Intermediate term
     # I = (2*pi^2*r_w^3*sigma*T_w^4/rho_c)^0.5;   % Max tolerable current
     # J_1 = (3*(2^0.5)*N*I)/(p*tau);              % LIM surface current
@@ -172,8 +180,8 @@ def simulate():
     #     + J_1.*B_1.*exp(-x./alpha_1).*cos((pi.*x).*((1./tau)-(1./tau_e))+delta_1) ...
     #     + J_1.*B_2.*exp(-x./alpha_2).*cos((pi.*x).*((1./tau)+(1./tau_e))+delta_2);
     
-    # % Total Thrust
-    # T = W*integral(func,0,L,'ArrayValued',true);
+    # Total Thrust
+    # T = W*integral(func,0,L,'ArrayValued',true)
     
     
     #  Potential for frequency vs speed plot
@@ -183,14 +191,12 @@ def simulate():
     # nexttile
     # }
     
-    # % Makes the plots look nice
-    # max_T = find(T == max(T(:)));
-    # if v(max_T) > max_thrust_speed
-    #    max_thrust_speed = v(max_T); 
-    # end
-    # if max(T)>max_thrust_plot
-    #    max_thrust_plot = max(T); 
-    # end
+    # Makes the plots look nice
+    # max_T = np.amax(T)
+    # if v(max_T) > max_thrust_speed:
+    #    max_thrust_speed = v(max_T)
+    # if np.amax(T) > max_thrust_plot:
+    #    max_thrust_plot = np.amax(T)
     
     # % Optimal Thrust vs Speed Curve
     # optimal_thrust = [optimal_thrust; max_thrust_speed max(T)];
@@ -221,8 +227,8 @@ def simulate():
     # ylabel('Frequency (Hz)');
     # axis([0 v_s 0 max_freq_plot]);
     # %}
-    
-    
-    # f = f + freq_increment;                     % Incrementing frequency        
-
- 
+        f = f + freq_increment                     # Incrementing frequency        
+print('before simulation')
+check_configuration_validity()
+simulate()
+print('after simulation')   
