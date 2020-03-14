@@ -6,25 +6,44 @@
 # This file was converted from MATLAB to Python by Controls
 
 import math
+import argparse
+import matplotlib.pyplot as plt
 import numpy as np
 
-# Physical Constants
-rho = 3.99e-8                  # Track resistivity
-g_c = 0.413 * 0.0254           # Track thickness
-rho_s = rho / g_c              # Track surface resistivity
-mu_0 = math.pi * 4e-7          # Vacuum permeability
-rho_c = 1.72e-8                # Coil resisitivity
-sigma = 5.67e-8                # Boltzmann's constant
+class Propulsion:
+    # Default parameters are physical and stability's constants
+    def __init__(
+        self, 
+        h_nz1 = 0.7 * 0.0254,
+        h_nz2 = (5-.413-.7) * 0.0254,
+        h_nz3 = 0.5 * 0.0254,
+        sigma_sh = 0.5 * 0.0254,
+        w_nz1 = 0.75,
+        w_nz2 = 0.412,
+        sigma_sw = 0.5 * 0.0254,
+        rho = 3.99e-8,
+        g_c = 0.413 * 0.0254,
+        rho_c = 1.72e-8):
 
-# Stability's Constants
-h_nz1 = 0.7 * 0.0254
-h_nz2 = (5-.413-.7) * 0.0254
-h_nz3 = 0.5 * 0.0254
-sigma_sh = 0.5 * 0.0254        # Minimum available horizontal variation
-w_nz1 = 0.75
-w_nz2 = 0.412
-sigma_sw = 0.5 * 0.0254        # Minimum available vertical variation
+        # Universal Physical Constants
+        self.mu_0 = math.pi * 4e-7          # Vacuum permeability
+        self.sigma = 5.67e-8                # Boltzmann's constant
 
+        # Stability's Constants
+        self.h_nz1 = h_nz1
+        self.h_nz2 = h_nz2
+        self.h_nz3 = h_nz3
+        self.sigma_sh = sigma_sh    # Minimum available horizontal variation
+        self.w_nz1 = w_nz1
+        self.w_nz2 = w_nz2
+        self.sigma_sw = sigma_sw    # Minimum available verical variation  
+
+        # Physical Constants
+        self.rho = rho                      # Track resistivity
+        self.g_c = g_c                      # Track thickness
+        self.rho_s = self.rho / self.g_c    # Track surface resistivity
+        self.rho_c = rho_c                  # Coil resisitivity
+        
 # %########### Straddle LIM Configurations #############%
 # %{
 # %--------------Config 1 (60N) (Closest)---------------%
