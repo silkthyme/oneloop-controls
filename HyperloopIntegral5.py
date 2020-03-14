@@ -44,72 +44,39 @@ class Propulsion:
         self.rho_s = self.rho / self.g_c    # Track surface resistivity
         self.rho_c = rho_c                  # Coil resisitivity
         
-# %########### Straddle LIM Configurations #############%
-# %{
-# %--------------Config 1 (60N) (Closest)---------------%
-# g = g_c + (2 * (sigma_sh + 0)); 
-# W = (3.42 - w_nz1 - (2*sigma_sw))* 0.0254;
-# %}
-# %{
-# %--------------Config 2 (40N)-------------------------%
-# %g = g_c + (2 * (sigma_sh + h_nz1)); 
-# %W = (3.42 - (2*sigma_sw))* 0.0254;
-# %}
-# %{
-# %--------------Config 3 (6N)--------------------------%
-# %g = g_c + (2 * (sigma_h + h_nz1 + h_nz2));
-# %W = 3.42 * 0.0254;
-# %}
-# %{
-# %--------------Config 4 (6N)--------------------------%
-# %g = g_c + (2 * (sigma_sh + h_nz1 + h_nz2 + h_nz3)); 
-# %W = (3.42 + w_nz2) * 0.0254;
-# %}
-# %#####################################################%
+        # Top LIM Config 5 (60N) (Closest)
+        self.g = g_c + (2 * (sigma_sh))
+        self.W = 5 * 0.0254
 
+        # LIM Configuration Constants
+        self.L = 55 * 0.0254                 # LIM length
+        self.f = 10                          # Starting frequency
+        self.r_w = 7.12e-4                   # Wire radius
+        self.r_c = 14*self.r_w               # Coil radius
+        self.N = 127                         # Windings per coil
+        self.T_w = 155 + 273                 # Wire temperature threshold
+        self.p = 4                           # Number of poles (not pole pairs)
+        self.tau = self.L/(4*self.p)         # Pole pitch
 
-# %############## Top LIM Configurations ###############%
-# %--------------Config 5 (60N) (Closest)---------------%
-g = g_c + (2 * (sigma_sh))
-W = 5 * 0.0254
+    def check_configuration_validity(self):
+        if self.r_c > (self.tau/3):
+            print("Coil width larger than tooth")
 
-# %{
-# %--------------Config 6 (40N)-------------------------%
-# %g = g_c + (2 * (1.5*sigma_sh)); 
-# %W = 5 * 0.0254;
-# %}
-# %#####################################################%
+    def setup_simulation(self, max_speed = 111.76):
+        # Desired LIM Qualities
+        self.max_speed = max_speed
+        self.max_freq = (self.max_speed/(2*self.tau))
 
-# LIM Configuration Constants
-L = 55 * 0.0254                 # LIM length
-f = 10                          # Starting frequency
-r_w = 7.12e-4                   # Wire radius
-r_c = 14*r_w                    # Coil radius
-N = 127                         # Windings per coil
-T_w = 155 + 273                 # Wire temperature threshold
-p = 4                           # Number of poles (not pole pairs)
-tau = L/(4*p)                   # Pole pitch
+        # Stuff to make the plot look nice
+        self.max_thrust_plot = 0
+        self.max_freq_plot = 0
+        self.max_thrust_speed = 0
+        self.optimal_thrust = []
+        self.optimal_freq = []
 
-# Check for configuration validity
-def check_configuration_validity():
-    if r_c > (tau/3):
-        print("Coil width larger than tooth")
-
-# Desired LIM Qualities
-max_speed = 111.76
-max_freq = (max_speed/(2*tau))
-
-# Stuff to make the plot look nice
-max_thrust_plot = 0
-max_freq_plot = 0
-max_thrust_speed = 0
-optimal_thrust = []
-optimal_freq = []
-
-# Resolution
-freq_increment = 1
-v_fidelity = 100
-
+        # Resolution
+        self.freq_increment = 1
+        self.v_fidelity = 100
 
 def simulate():
     # v_s and the second condition in the while loop prevent runaway simulations
@@ -249,7 +216,3 @@ def simulate():
         # %}
         f = f + freq_increment                     # Incrementing frequency        
 
-print('before simulation')
-check_configuration_validity()
-simulate()
-print('after simulation')   
