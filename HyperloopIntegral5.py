@@ -77,74 +77,66 @@ class Propulsion:
         self.freq_increment = 1
         self.v_fidelity = 100
 
-    def solve(self):
-        print('Hi')
-
     def simulate(self):
         # v_s and the second condition in the while loop prevent runaway simulations
         v_s = 0
-        f = 10
-        max_thrust_speed = 0
-        max_speed = 111.76
-        freq_increment = 1
-        while (max_thrust_speed < max_speed and v_s < max_speed + 100):
+        while (self.max_thrust_speed < self.max_speed and v_s < self.max_speed + 100):
+            plt.clf()
+
             # Other Parameters
-            max_thrust_speed += 1
-            print(v_s)
-            print(f)
-            v_s = 2 * f * tau                           # Motor speed             
-            v = np.linspace(1, v_s, num=v_fidelity)     # Velocity array
-            omega = 2 * math.pi * f                     # Angular frequency
-            c = (4*rho_s*g*omega) / (mu_0*(v**2))       # Intermediate term
-            tau_e = (v*math.pi)/(omega*(2**0.5)) \
-            * (1 + (1 + (c**2))**0.5)**0.5             # Shockwave half wavelength
-            beta = (rho_s*g) / (v*mu_0)                 # Intermediate term
-            I = (2*math.pi**2*r_w**3*sigma*T_w \
-            **4/rho_c)**0.5                             # Max tolerable current
-            J_1 = (3*(2**0.5)*N*I)/(p*tau)              # LIM surface current
+            self.max_thrust_speed += 1 #TODO: delete this later 
+         
+            v_s = 2 * self.f * self.tau                             # Motor speed             
+            v = np.linspace(1, v_s, num=self.v_fidelity)            # Velocity array
+            omega = 2 * np.pi * self.f                              # Angular frequency
+            c = (4*self.rho_s*self.g*omega) / (self.mu_0*(v**2))    # Intermediate term
+            tau_e = (v*np.pi)/(omega*(2**0.5)) \
+            * (1 + (1 + (c**2))**0.5)**0.5                          # Shockwave half wavelength
+            beta = (self.rho_s*self.g) / (v*self.mu_0)              # Intermediate term
+            I = (2*np.pi**2*self.r_w**3*self.sigma*self.T_w \
+            **4/self.rho_c)**0.5                                    # Max tolerable current
+            J_1 = (3*(2**0.5)*self.N*I)/(self.p*self.tau)           # LIM surface current
         
-        
-            # %######## Magnetic Field Amplitudes ########%
+            #     %######## Magnetic Field Amplitudes ########%
             
             # % LIM's Magnetic Field
-            B_s = J_1 / (((math.pi*g)/(tau*mu_0))**2 /  # LIM magnetic field magnitude
-                + ((1/rho_s)*(v_s-v))**2)**0.5
-            delta_s = np.arctan((math.pi*rho_s*g) \
-                / (mu_0*tau*(v_s-v)))                   # LIM magnetic field phase
+            # B_s = J_1 ./ (((pi*g)/(tau*mu_0))^2 ...     % LIM magnetic field magnitude
+            #     + ((1/rho_s)*(v_s-v)).^2).^0.5;
+            # delta_s = atan((pi*rho_s*g)...              % LIM magnetic field phase
+            #     ./(mu_0*tau*(v_s-v)));
             
             # % Intermediate terms for B1 and B2
-            a = ((mu_0*v)/(rho_s*g))**2
-            b = (4*omega*mu_0)/(rho_s*g)
-            X = ((((a**2 + b**2)**0.5) + a) / 2)**0.5
+            # a = ((mu_0*v)/(rho_s*g)).^2;
+            # b = (4*omega*mu_0)/(rho_s*g);
+            # X = ((((a.^2 + b^2).^0.5) + a)./2).^0.5;
             
             
             # % Front Magnetic Shockwave
-            alpha_1 = (2*rho_s*g) \
-                / ((rho_s * g * X) - (mu_0 * v))   # Front magnetic shockwave decay constant
+            # alpha_1 = (2*rho_s*g)...                    % Front magnetic shockwave decay constant
+            #     ./((rho_s*g.*X) - (mu_0.*v));
             
             # % Front magnetic shockwave intermediate terms
+            # gamma_1 = ((1 + (beta/alpha_1)).^2 + ((beta*pi)/tau_e).^2).^(-1);
+            # term1 = -(rho_s.*J_1./v) - B_s.*cos(delta_s) + (beta.*pi.*B_s/tau).*sin(delta_s);
+            # term2 = 1 + (beta/alpha_1);
+            # term3 = (beta.*pi.*B_s/tau).*cos(delta_s) + B_s.*sin(delta_s);
+            # term4 = beta*pi/tau;
             
-            gamma_1 = ((1 + (beta/alpha_1))**2 + ((beta*math.pi)/tau_e)**2)**(-1)
-            #TODO: fix term1 and term3
-            term1 = -(rho_s * np.divide(J_1, v, np.vectorize(np.int))) - B_s * math.cos(delta_s) + (beta * math.pi *B_s/tau) * math.sin(delta_s)
-            term2 = 1 + (beta/alpha_1)
-            # term3 = (beta * math.pi * B_s / tau) * math.cos(delta_s) + B_s * math.sin(delta_s)
-            term4 = beta*math.pi/tau
-            # delta_1 = np.arctan((term1 * term4 \
-            #     + term3 * term2)/(term1 * term2 \
-            #     + term3 * term4))             # Front magnetic shockwave phase
-            # B_1 = (term1 * term4 + term3 * term2) \
-            #     * gamma_1/math.cos(delta_1)         # Front magnetic shockwave amplitude
+            # delta_1 = atan((term1.*term4 ...            % Front magnetic shockwave phase
+            #     + term3.*term2)/(term1.*term2...
+            #     + term3.*term4));
+            # B_1 = (term1.*term4 + term3.*term2)...      % Front magnetic shockwave amplitude
+            #     *gamma_1/cos(delta_1);
             
             
-            # Rear Magnetic Shockwave
-            alpha_2 = (2 * rho_s * g) \
-                / ((rho_s * g * X) + (mu_0 * v))        # Rear magnetic shockwave decay constant
+            # % Rear Magnetic Shockwave
+            # alpha_2 = (2*rho_s*g)...                    % Rear magnetic shockwave decay constant
+            #     ./((rho_s*g.*X) + (mu_0.*v));
             
-            # Rear magnetic shockwave intermediate terms
-            gamma_2 = ((1 - (beta/alpha_2))**2 + ((beta*math.pi) / tau_e)**2)**(-1)
-            term5 = B_1 * math.cos(delta_1)
-            term6 = 1 - (exp(-L / alpha_1) * math.cos(math.pi * L / tau_e))
+            # % Rear magnetic shockwave intermediate terms
+            # gamma_2 = ((1 - (beta/alpha_2)).^2 + ((beta*pi)./tau_e).^2).^(-1);
+            # term5 = B_1*cos(delta_1);
+            # term6 = 1 - (exp(-L./alpha_1).*cos(pi.*L./tau_e));
             # term7 = B_1*sin(delta_1);
             # term8 = exp(-L./alpha_1).*sin(pi.*L./tau_e);
             # term9 = -1 - (beta/alpha_1);
@@ -169,23 +161,25 @@ class Propulsion:
             #     + J_1.*B_1.*exp(-x./alpha_1).*cos((pi.*x).*((1./tau)-(1./tau_e))+delta_1) ...
             #     + J_1.*B_2.*exp(-x./alpha_2).*cos((pi.*x).*((1./tau)+(1./tau_e))+delta_2);
             
-            # Total Thrust
-            # T = W*integral(func,0,L,'ArrayValued',true)
+            # % Total Thrust
+            # T = W*integral(func,0,L,'ArrayValued',true);
             
             
-            #  Potential for frequency vs speed plot
-            # {
+            # % Potential for frequency vs speed plot
+            # %{
             # tiledlayout(2, 1);
             # set(gcf, 'Position',  [100, 100, 1000, 800])
             # nexttile
-            # }
+            # %}
             
-            # Makes the plots look nice
-            # max_T = np.amax(T)
-            # if v(max_T) > max_thrust_speed:
-            #    max_thrust_speed = v(max_T)
-            # if np.amax(T) > max_thrust_plot:
-            #    max_thrust_plot = np.amax(T)
+            # % Makes the plots look nice
+            # max_T = find(T == max(T(:)));
+            # if v(max_T) > max_thrust_speed
+            # max_thrust_speed = v(max_T); 
+            # end
+            # if max(T)>max_thrust_plot
+            # max_thrust_plot = max(T); 
+            # end
             
             # % Optimal Thrust vs Speed Curve
             # optimal_thrust = [optimal_thrust; max_thrust_speed max(T)];
@@ -205,18 +199,19 @@ class Propulsion:
             
             # % Potential for frequency vs speed plot
             # %{
-            # %nexttile
-            # %optimal_freq = [optimal_freq; max_thrust_speed f];
-            # %if max(optimal_freq(:,2))>max_freq_plot
-            #    %max_freq_plot = max(optimal_freq(:,2)); 
-            # %end
+            # nexttile
+            # optimal_freq = [optimal_freq; max_thrust_speed f];
+            # if max(optimal_freq(:,2))>max_freq_plot
+            # max_freq_plot = max(optimal_freq(:,2)); 
+            # end
             
             # plot(optimal_freq(:,1), optimal_freq(:,2));
             # xlabel('Speed (mph)');
             # ylabel('Frequency (Hz)');
             # axis([0 v_s 0 max_freq_plot]);
             # %}
-            f = f + freq_increment                     # Incrementing frequency        
+
+            f = f + self.freq_increment         # Incrementing frequency        
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--propulsion", nargs = '+', type = float,
@@ -236,8 +231,7 @@ propulsion = Propulsion(
     args.propulsion[7],
     args.propulsion[8],
     args.propulsion[9])
-    
+
 propulsion.check_configuration_validity()
 propulsion.setup_simulation(args.sim[0])
-propulsion.solve()
 propulsion.simulate()
